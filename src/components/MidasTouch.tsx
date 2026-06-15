@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useSpring, useMotionValue } from "framer-motion";
 
 interface TrailParticle {
   id: number;
@@ -31,7 +31,14 @@ interface FloatingText {
   text: string;
 }
 
+interface CursorTrailPoint {
+  x: number;
+  y: number;
+  timestamp: number;
+}
+
 const WORDS = ["HAIL JESUS", "MIDAS", "SANGUIS", "AURUM", "AVARITIA", "HAIL MARIA"];
+const TRAIL_LENGTH = 10;
 
 export default function MidasTouch() {
   const [trail, setTrail] = useState<TrailParticle[]>([]);
@@ -40,11 +47,22 @@ export default function MidasTouch() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHoveringInteractive, setIsHoveringInteractive] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
-  
+
   const lastMoveTimeRef = useRef(0);
   const particleIdRef = useRef(0);
   const bloodIdRef = useRef(0);
   const textIdRef = useRef(0);
+
+  // Cursor trail positions ref (last N positions for dot trail)
+  const cursorTrailRef = useRef<CursorTrailPoint[]>([]);
+  const [cursorTrail, setCursorTrail] = useState<CursorTrailPoint[]>([]);
+  const cursorTrailFrameRef = useRef<number>(0);
+
+  // Spring-based glow follower
+  const glowX = useMotionValue(0);
+  const glowY = useMotionValue(0);
+  const springGlowX = useSpring(glowX, { stiffness: 120, damping: 20, mass: 0.5 });
+  const springGlowY = useSpring(glowY, { stiffness: 120, damping: 20, mass: 0.5 });
 
   // Check touch capability
   useEffect(() => {
@@ -58,21 +76,31 @@ export default function MidasTouch() {
     const handleMouseMove = (e: MouseEvent) => {
       setMousePos({ x: e.clientX, y: e.clientY });
 
-      // Throttle particle emission
+      // Update glow position with spring
+      glowX.set(e.clientX);
+      glowY.set(e.clientY);
+
+      // Update cursor trail positions
       const now = Date.now();
+      cursorTrailRef.current = [
+        ...cursorTrailRef.current,
+        { x: e.clientX, y: e.clientY, timestamp: now },
+      ].slice(-TRAIL_LENGTH);
+
+      // Throttle particle emission
       if (now - lastMoveTimeRef.current > 30) {
         lastMoveTimeRef.current = now;
-        
+
         // Spawn 2-4 gold & luxury dust particles
         const newParticles: TrailParticle[] = [];
         const count = Math.floor(Math.random() * 3) + 2; // 2 to 4 particles
-        
+
         for (let i = 0; i < count; i++) {
           const chars = ["✦", "★", "✧", "•", "✨", "⚜", "♛", "🜚"];
           const char = chars[Math.floor(Math.random() * chars.length)];
           const size = Math.random() * 10 + 4;
           const id = particleIdRef.current++;
-          
+
           newParticles.push({
             id,
             x: e.clientX + (Math.random() - 0.5) * 8,
@@ -89,7 +117,7 @@ export default function MidasTouch() {
         setTrail((prev) => [...prev, ...newParticles].slice(-75)); // Keep max 75 particles
       }
 
-      // Check if hovering over interactive elements
+      // Check if hovering over interactive elements (including data-magnetic)
       const target = e.target as HTMLElement;
       if (target) {
         const isInteractive =
@@ -99,22 +127,37 @@ export default function MidasTouch() {
           target.closest("button") ||
           target.closest(".cursor-pointer") ||
           target.getAttribute("role") === "button" ||
+          target.hasAttribute("data-magnetic") ||
+          target.closest("[data-magnetic]") ||
           target.tagName === "INPUT" ||
           target.tagName === "TEXTAREA" ||
           target.tagName === "SELECT";
-        
+
         setIsHoveringInteractive(!!isInteractive);
       }
     };
 
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [isTouchDevice, glowX, glowY]);
+
+  // Update cursor trail state at ~60fps for rendering the dot trail
+  useEffect(() => {
+    if (isTouchDevice) return;
+
+    const updateCursorTrail = () => {
+      setCursorTrail([...cursorTrailRef.current]);
+      cursorTrailFrameRef.current = requestAnimationFrame(updateCursorTrail);
+    };
+
+    cursorTrailFrameRef.current = requestAnimationFrame(updateCursorTrail);
+    return () => cancelAnimationFrame(cursorTrailFrameRef.current);
   }, [isTouchDevice]);
 
   // Trail physics update loop
   useEffect(() => {
     let frameId: number;
-    
+
     const updateTrail = () => {
       setTrail((prev) =>
         prev
@@ -173,27 +216,27 @@ export default function MidasTouch() {
 
       // Trigger dynamic chime audio on click
       window.dispatchEvent(
-        new CustomEvent("play-audio-chime", { 
-          detail: { freq: 180 + Math.random() * 90, isDeep: true } 
+        new CustomEvent("play-audio-chime", {
+          detail: { freq: 180 + Math.random() * 90, isDeep: true },
         })
       );
 
-      // 1. Create Blood & Gold particles
+      // 1. Create Blood & Gold particles - more dramatic
       const newParticles: BloodGoldParticle[] = [];
-      const particleCount = Math.floor(Math.random() * 8) + 16; // 16 to 24 particles
-      
+      const particleCount = Math.floor(Math.random() * 5) + 14; // 14 to 18 particles
+
       for (let i = 0; i < particleCount; i++) {
         const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 8 + 3;
-        const maxLife = Math.random() * 500 + 700; // 700ms - 1200ms
-        
+        const speed = Math.random() * 10 + 3;
+        const maxLife = Math.random() * 800 + 700; // 700ms - 1500ms (longer lifespan)
+
         newParticles.push({
           id: bloodIdRef.current++,
           x,
           y,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed - 2.5, // initial upward blast
-          size: Math.random() * 6 + 3,
+          size: Math.random() * 7 + 3, // 3-10px (varying sizes)
           life: 0,
           maxLife,
         });
@@ -237,23 +280,71 @@ export default function MidasTouch() {
         `}</style>
       )}
 
+      {/* Subtle Gold Glow following cursor with spring physics */}
+      {!isTouchDevice && (
+        <motion.div
+          className="fixed pointer-events-none z-[99994] rounded-full"
+          style={{
+            left: springGlowX,
+            top: springGlowY,
+            width: 40,
+            height: 40,
+            x: -20,
+            y: -20,
+            background: 'radial-gradient(circle, hsl(45, 82%, 54%) 0%, transparent 70%)',
+            filter: 'blur(20px)',
+            opacity: 0.1,
+          }}
+        />
+      )}
+
+      {/* Cursor Dot Trail - small fading gold dots at recent positions */}
+      {!isTouchDevice && (
+        <div className="fixed inset-0 pointer-events-none z-[99995] overflow-hidden">
+          {cursorTrail.map((point, index) => {
+            const age = (cursorTrail.length - index) / cursorTrail.length;
+            const size = 3 + (1 - age) * 4; // 3px to 7px
+            const opacity = (1 - age) * 0.5; // fading
+            return (
+              <div
+                key={`trail-dot-${index}`}
+                className="absolute rounded-full"
+                style={{
+                  left: point.x - size / 2,
+                  top: point.y - size / 2,
+                  width: size,
+                  height: size,
+                  backgroundColor: 'hsl(45, 82%, 54%)',
+                  opacity,
+                  boxShadow: `0 0 ${size}px hsl(45, 82%, 54%)`,
+                }}
+              />
+            );
+          })}
+        </div>
+      )}
+
       {/* Interactive Custom Cursor */}
       {!isTouchDevice && (
         <div
           className="fixed pointer-events-none z-[99999] transition-transform duration-75 -translate-x-1/2 -translate-y-1/2"
           style={{ left: mousePos.x, top: mousePos.y }}
         >
-          {/* Outer ring - Gold */}
+          {/* Outer ring - Gold, larger & pulsing when hovering interactive */}
           <motion.div
             animate={{
               rotate: 360,
-              scale: isHoveringInteractive ? 1.4 : 1,
+              scale: isHoveringInteractive ? 1.8 : 1,
             }}
             transition={{
               rotate: { repeat: Infinity, duration: 4, ease: "linear" },
               scale: { type: "spring", stiffness: 300, damping: 20 },
             }}
-            className={`w-8 h-8 rounded-full border border-gold-base/60 flex items-center justify-center`}
+            className={`w-8 h-8 rounded-full border ${
+              isHoveringInteractive
+                ? "border-gold-base shadow-[0_0_15px_hsl(45,82%,54%,0.4)]"
+                : "border-gold-base/60"
+            } flex items-center justify-center transition-shadow duration-300`}
           >
             {/* Inner ring - Blood/Gold shifting */}
             <motion.div
@@ -282,9 +373,15 @@ export default function MidasTouch() {
                 animate={{ opacity: 0.5, scale: [1.6, 1.8, 1.6], rotate: -360 }}
                 transition={{
                   rotate: { repeat: Infinity, duration: 8, ease: "linear" },
-                  scale: { repeat: Infinity, duration: 2, ease: "easeInOut" }
+                  scale: { repeat: Infinity, duration: 2, ease: "easeInOut" },
                 }}
                 className="absolute inset-[-12px] rounded-full border border-gold-base/35"
+              />
+              {/* Pulsing gold ring for magnetic/interactive elements */}
+              <motion.div
+                animate={{ scale: [1.8, 2.2, 1.8], opacity: [0.2, 0.4, 0.2] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute inset-[-18px] rounded-full border border-gold-base/30"
               />
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-[1px] bg-gold-base/50 blur-[1px] animate-pulse" />
             </>
@@ -321,7 +418,7 @@ export default function MidasTouch() {
           const isGold = p.life >= 0.4;
           const progress = p.life;
           const opacity = 1 - progress;
-          
+
           return (
             <div
               key={p.id}
@@ -332,7 +429,7 @@ export default function MidasTouch() {
                 width: `${p.size}px`,
                 height: `${p.size}px`,
                 backgroundColor: isGold ? "#ffeeb8" : "#8a0303",
-                boxShadow: isGold 
+                boxShadow: isGold
                   ? "0 0 10px #ffeeb8, 0 0 20px #d4a359"
                   : "0 0 6px #8a0303, inset 0 0 4px #000",
                 opacity,
