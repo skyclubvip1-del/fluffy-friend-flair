@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight, Phone, Instagram, Clock, MessageCircle } from "lucide-react";
 import { buildWhatsAppUrl, generalReserveMessage } from "@/lib/whatsapp";
 
@@ -17,7 +18,31 @@ const legalLinks = [
   { name: "Política de Reembolso", href: "#" },
 ];
 
+/* Constellation dots positioned between columns */
+const constellationPoints = [
+  { x: 25, y: 30 },
+  { x: 40, y: 55 },
+  { x: 55, y: 25 },
+  { x: 70, y: 60 },
+  { x: 35, y: 75 },
+];
+
+const constellationLines: [number, number][] = [
+  [0, 1],
+  [1, 2],
+  [2, 3],
+  [3, 4],
+  [4, 1],
+];
+
 const Footer = () => {
+  const footerRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: footerRef,
+    offset: ["start end", "end start"],
+  });
+  const bgTextY = useTransform(scrollYProgress, [0, 1], ["10%", "-10%"]);
+
   const handleScrollClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith("#") && href !== "#") {
       e.preventDefault();
@@ -27,8 +52,49 @@ const Footer = () => {
   };
 
   return (
-    <footer id="footer" className="relative bg-void border-t border-white/10">
-      <div className="max-w-7xl mx-auto px-6 py-16 md:py-24">
+    <footer id="footer" ref={footerRef} className="relative bg-void border-t border-white/10 overflow-hidden">
+      {/* Giant Background SKY CLUB text with parallax */}
+      <motion.div
+        style={{ y: bgTextY }}
+        className="text-[15vw] font-display font-bold text-white/[0.015] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap pointer-events-none select-none"
+      >
+        SKY CLUB
+      </motion.div>
+
+      {/* Constellation Effect */}
+      <svg
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        style={{ opacity: 0.1 }}
+      >
+        {/* Lines connecting constellation dots */}
+        {constellationLines.map(([from, to], i) => (
+          <motion.line
+            key={`line-${i}`}
+            x1={`${constellationPoints[from].x}%`}
+            y1={`${constellationPoints[from].y}%`}
+            x2={`${constellationPoints[to].x}%`}
+            y2={`${constellationPoints[to].y}%`}
+            stroke="hsl(45, 82%, 54%)"
+            strokeWidth="0.5"
+            animate={{ opacity: [0.3, 0.7, 0.3] }}
+            transition={{ duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut" }}
+          />
+        ))}
+        {/* Constellation dots */}
+        {constellationPoints.map((pt, i) => (
+          <motion.circle
+            key={`dot-${i}`}
+            cx={`${pt.x}%`}
+            cy={`${pt.y}%`}
+            r="2"
+            fill="hsl(45, 82%, 54%)"
+            animate={{ opacity: [0.4, 1, 0.4], r: [1.5, 2.5, 1.5] }}
+            transition={{ duration: 2 + i * 0.3, repeat: Infinity, ease: "easeInOut" }}
+          />
+        ))}
+      </svg>
+
+      <div className="relative max-w-7xl mx-auto px-6 py-16 md:py-24">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
           {/* Brand Column */}
           <div className="md:col-span-1">
@@ -62,7 +128,7 @@ const Footer = () => {
                   >
                     <span className="relative">
                       {link.name}
-                      <span className="absolute bottom-0 left-0 w-0 h-px bg-gold-base group-hover:w-full transition-all duration-300" />
+                      <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-gold-base group-hover:w-full transition-all duration-300 shimmer" />
                     </span>
                     <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </a>
@@ -81,9 +147,10 @@ const Footer = () => {
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="font-body text-sm text-white/30 hover:text-white/50 transition-colors duration-300"
+                    className="group relative inline-block font-body text-sm text-white/30 hover:text-white/50 transition-colors duration-300"
                   >
                     {link.name}
+                    <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-gold-base/50 group-hover:w-full transition-all duration-300 shimmer" />
                   </a>
                 </li>
               ))}
@@ -147,6 +214,44 @@ const Footer = () => {
           viewport={{ once: true }}
           className="mt-16 relative rounded-2xl overflow-hidden h-64 border border-white/10"
         >
+          {/* Animated Gold Corner Decorations */}
+          {/* Top-Left Corner */}
+          <motion.div
+            className="absolute top-0 left-0 z-10 pointer-events-none"
+            animate={{ opacity: [0.4, 0.8, 0.4] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <div className="w-6 h-[1px] bg-gold-base" />
+            <div className="w-[1px] h-6 bg-gold-base" />
+          </motion.div>
+          {/* Top-Right Corner */}
+          <motion.div
+            className="absolute top-0 right-0 z-10 pointer-events-none flex flex-col items-end"
+            animate={{ opacity: [0.4, 0.8, 0.4] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+          >
+            <div className="w-6 h-[1px] bg-gold-base" />
+            <div className="w-[1px] h-6 bg-gold-base self-end" />
+          </motion.div>
+          {/* Bottom-Left Corner */}
+          <motion.div
+            className="absolute bottom-0 left-0 z-10 pointer-events-none flex flex-col justify-end"
+            animate={{ opacity: [0.4, 0.8, 0.4] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          >
+            <div className="w-[1px] h-6 bg-gold-base" />
+            <div className="w-6 h-[1px] bg-gold-base" />
+          </motion.div>
+          {/* Bottom-Right Corner */}
+          <motion.div
+            className="absolute bottom-0 right-0 z-10 pointer-events-none flex flex-col items-end justify-end"
+            animate={{ opacity: [0.4, 0.8, 0.4] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+          >
+            <div className="w-[1px] h-6 bg-gold-base self-end" />
+            <div className="w-6 h-[1px] bg-gold-base" />
+          </motion.div>
+
           <iframe
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3080.0247853957896!2d-0.3808433!3d39.4669444!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd6048a30e3e5f5f%3A0x8c5c5c5c5c5c5c5c!2sCarrer%20Just%20Ram%C3%ADrez%2C%202%2C%2046006%20Val%C3%A8ncia%2C%20Spain!5e0!3m2!1sen!2ses!4v1703789999999!5m2!1sen!2ses"
             width="100%"
@@ -185,7 +290,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="font-body text-xs text-white/20">
-            © 2024 Sky Club. Todos los derechos reservados.
+            © 2025 Sky Club. Todos los derechos reservados.
           </p>
           <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/10">
             Architected by Paimon

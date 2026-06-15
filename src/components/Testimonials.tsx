@@ -58,8 +58,35 @@ const TestimonialCard = ({ name, role, achievement, quote, image, delay = 0 }: T
       }}
       className="relative group cursor-pointer"
     >
+      {/* Holographic rotating gradient border */}
+      <div
+        className="absolute -inset-[2px] rounded-2xl z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+        style={{
+          background: "conic-gradient(from var(--border-angle, 0deg), #d4a359, transparent 30%, transparent 70%, #d4a359)",
+          animation: "spin 4s linear infinite",
+        }}
+      />
+      <style>{`@keyframes spin { to { --border-angle: 360deg; } } @property --border-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }`}</style>
       {/* Image Container */}
-      <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 group-hover:border-gold-base/40 shadow-[0_15px_45px_rgba(212,163,89,0.35)] transition-all duration-500 border-beam">
+      <div className={`relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 group-hover:border-gold-base/40 transition-all duration-500 border-beam ${isHovered ? 'shadow-[0_20px_60px_rgba(212,163,89,0.25),0_0_30px_rgba(212,163,89,0.1)]' : 'shadow-[0_15px_45px_rgba(212,163,89,0.35)]'}`}>
+        {/* Diagonal hatching pattern overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none z-[5]"
+          style={{
+            opacity: 0.03,
+            backgroundImage: "repeating-linear-gradient(45deg, #fff 0px, #fff 1px, transparent 1px, transparent 20px)",
+          }}
+        />
+        {/* Gold shimmer sweep on hover */}
+        <div
+          className={`absolute inset-0 pointer-events-none z-[6] transition-opacity duration-500 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
+          style={{
+            background: "linear-gradient(110deg, transparent 20%, rgba(212,163,89,0.12) 45%, rgba(255,255,255,0.15) 50%, rgba(212,163,89,0.12) 55%, transparent 80%)",
+            backgroundSize: "200% 100%",
+            animation: isHovered ? "shimmer-sweep 2s ease-in-out infinite" : "none",
+          }}
+        />
+        <style>{`@keyframes shimmer-sweep { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
         <img
           src={image}
           alt={name}

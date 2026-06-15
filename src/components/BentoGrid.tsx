@@ -80,8 +80,26 @@ const BentoCard = ({ title, subtitle, image, className = "", delay = 0, scrollTo
         transformPerspective: 1000,
         transformStyle: "preserve-3d",
       }}
-      className={`group relative bg-void border border-gold-base/20 rounded-2xl overflow-hidden cursor-pointer transition-shadow duration-700 hover:shadow-[0_0_50px_rgba(212,163,89,0.35)] min-h-[220px] border-beam ${className} preserve-3d`}
+      className={`group relative bg-void border border-gold-base/20 rounded-2xl overflow-hidden cursor-pointer transition-shadow duration-700 hover:shadow-[0_25px_70px_rgba(212,163,89,0.3)] min-h-[220px] border-beam ${className} preserve-3d`}
     >
+      {/* Diagonal hatching pattern overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none z-[5]"
+        style={{
+          opacity: 0.02,
+          backgroundImage: "repeating-linear-gradient(45deg, #fff 0px, #fff 1px, transparent 1px, transparent 20px)",
+        }}
+      />
+      {/* Gold scanner line on hover */}
+      <div
+        className={`absolute left-0 right-0 h-[1px] pointer-events-none z-[15] transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
+        style={{
+          background: "linear-gradient(90deg, transparent, rgba(212,163,89,0.6), rgba(255,223,150,0.8), rgba(212,163,89,0.6), transparent)",
+          boxShadow: "0 0 8px rgba(212,163,89,0.4), 0 0 20px rgba(212,163,89,0.2)",
+          animation: isHovered ? "scanLine 2.5s ease-in-out infinite" : "none",
+        }}
+      />
+      <style>{`@keyframes scanLine { 0%, 100% { top: 0%; } 50% { top: 100%; } }`}</style>
       {/* Intense Midas Gold Glow effect */}
       <div 
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10"
@@ -260,8 +278,25 @@ const BentoGrid = () => {
             transformPerspective: 1000,
             transformStyle: "preserve-3d",
           }}
-          className="group relative bg-void border border-gold-base/20 rounded-2xl overflow-hidden cursor-pointer md:col-span-1 md:row-span-2 hover:shadow-[0_0_50px_rgba(212,163,89,0.35)] transition-shadow duration-700 border-beam"
+          className="group relative bg-void border border-gold-base/20 rounded-2xl overflow-hidden cursor-pointer md:col-span-1 md:row-span-2 hover:shadow-[0_25px_70px_rgba(212,163,89,0.3)] transition-shadow duration-700 border-beam"
         >
+          {/* Diagonal hatching pattern overlay */}
+          <div
+            className="absolute inset-0 pointer-events-none z-[5]"
+            style={{
+              opacity: 0.02,
+              backgroundImage: "repeating-linear-gradient(45deg, #fff 0px, #fff 1px, transparent 1px, transparent 20px)",
+            }}
+          />
+          {/* Gold scanner line on hover */}
+          <div
+            className={`absolute left-0 right-0 h-[1px] pointer-events-none z-[15] transition-opacity duration-300 ${isPodcastHovered ? 'opacity-100' : 'opacity-0'}`}
+            style={{
+              background: "linear-gradient(90deg, transparent, rgba(212,163,89,0.6), rgba(255,223,150,0.8), rgba(212,163,89,0.6), transparent)",
+              boxShadow: "0 0 8px rgba(212,163,89,0.4), 0 0 20px rgba(212,163,89,0.2)",
+              animation: isPodcastHovered ? "scanLine 2.5s ease-in-out infinite" : "none",
+            }}
+          />
           {/* Glow effect */}
           <div 
             className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10"

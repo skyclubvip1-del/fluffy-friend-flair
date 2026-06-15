@@ -116,13 +116,45 @@ const PricingCard = ({ tier, price, originalPrice, offerLabel, icon, features, c
       className={`
         relative rounded-3xl p-8 transition-all duration-500 card-sheen cursor-pointer preserve-3d
         ${isPremium
-          ? 'bg-[#140e08] border-beam border-2 border-gold-base scale-105 md:scale-110 shadow-[0_20px_50px_rgba(212,163,89,0.35)] z-10'
+          ? 'bg-[#140e08] border-beam border-2 border-gold-base scale-105 md:scale-110 z-10'
           : isPopular
-            ? 'bg-[#0c0905]/85 border-beam border-2 border-gold-base/50 shadow-[0_15px_35px_rgba(212,163,89,0.2)]'
+            ? 'bg-[#0c0905]/85 border-beam border-2 border-gold-base/50'
             : 'bg-[#0e0a05] border border-gold-base/35 shadow-md'
+        }
+        ${isHovered
+          ? 'shadow-[0_25px_70px_rgba(212,163,89,0.35),0_0_40px_rgba(212,163,89,0.15)]'
+          : isPremium
+            ? 'shadow-[0_20px_50px_rgba(212,163,89,0.35)]'
+            : isPopular
+              ? 'shadow-[0_15px_35px_rgba(212,163,89,0.2)]'
+              : ''
         }
       `}
     >
+      {/* Diagonal hatching pattern overlay */}
+      <div
+        className="absolute inset-0 rounded-3xl pointer-events-none z-[1]"
+        style={{
+          opacity: 0.03,
+          backgroundImage: "repeating-linear-gradient(45deg, #fff 0px, #fff 1px, transparent 1px, transparent 20px)",
+        }}
+      />
+      {/* Pulsing gold border for ASCEND (popular) tier */}
+      {isPopular && (
+        <div
+          className="absolute -inset-[2px] rounded-3xl pointer-events-none z-0"
+          style={{
+            background: "conic-gradient(from var(--border-angle, 0deg), #d4a359, transparent 30%, transparent 70%, #d4a359)",
+            animation: "spin 4s linear infinite, pulse-border 2s ease-in-out infinite",
+            opacity: 0.7,
+          }}
+        />
+      )}
+      <style>{`
+        @property --border-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+        @keyframes spin { to { --border-angle: 360deg; } }
+        @keyframes pulse-border { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+      `}</style>
       {/* Popular Badge */}
       {isPopular && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gold-gradient text-void text-xs font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(212,163,89,0.3)]">
@@ -160,9 +192,19 @@ const PricingCard = ({ tier, price, originalPrice, offerLabel, icon, features, c
 
       {/* Price */}
       <div 
-        className="mb-6 transition-transform duration-500" 
+        className="mb-6 transition-transform duration-500 relative" 
         style={{ transform: isHovered ? "translateZ(25px)" : "translateZ(8px)" }}
       >
+        {/* Shimmer sweep on price */}
+        <div
+          className={`absolute inset-0 pointer-events-none z-[2] rounded-lg transition-opacity duration-500 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
+          style={{
+            background: "linear-gradient(110deg, transparent 20%, rgba(212,163,89,0.1) 45%, rgba(255,255,255,0.18) 50%, rgba(212,163,89,0.1) 55%, transparent 80%)",
+            backgroundSize: "200% 100%",
+            animation: isHovered ? "shimmer-sweep 2s ease-in-out infinite" : "none",
+          }}
+        />
+        <style>{`@keyframes shimmer-sweep { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
         {isFree ? (
           <span className="font-display font-bold text-5xl text-white">
             Gratis
@@ -213,10 +255,10 @@ const PricingCard = ({ tier, price, originalPrice, offerLabel, icon, features, c
             w-full py-4 rounded-full font-display font-bold text-sm uppercase tracking-wider
             transition-all duration-300
             ${isPremium
-              ? 'bg-gold-gradient text-void hover:shadow-gold hover:scale-[1.02]'
+              ? 'bg-gold-gradient text-void hover:shadow-[0_0_30px_rgba(212,163,89,0.5),0_0_60px_rgba(212,163,89,0.25)] hover:scale-[1.06]'
               : isPopular
-                ? 'bg-gold-gradient text-void hover:shadow-gold hover:scale-[1.02]'
-                : 'border border-gold-base/30 text-gold-light hover:bg-gold-base/10 hover:border-gold-base/60'
+                ? 'bg-gold-gradient text-void hover:shadow-[0_0_30px_rgba(212,163,89,0.5),0_0_60px_rgba(212,163,89,0.25)] hover:scale-[1.06]'
+                : 'border border-gold-base/30 text-gold-light hover:bg-gold-base/10 hover:border-gold-base/60 hover:shadow-[0_0_20px_rgba(212,163,89,0.2)] hover:scale-[1.04]'
             }
           `}
         >
