@@ -802,9 +802,7 @@ const HealthWellnessSection = () => {
                   <motion.a
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
-                    href={buildWhatsAppUrl(
-                      "Hola SKY CLUB ðŸ‘‹, me gustarÃ­a informaciÃ³n sobre vuestro programa completo de Salud y Bienestar. Â¿QuÃ© opciones tenÃ©is?"
-                    )}
+                    href="https://vital-depth-guide.lovable.app"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group flex items-center gap-3 px-7 py-3.5 rounded-full border border-gold-base/15 text-gold-light font-display text-xs uppercase tracking-wider hover:bg-gold-base/5 hover:border-gold-base/30 transition-all duration-300"
