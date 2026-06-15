@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <title>SKY CLUB Valencia | Barbería Premium & Lifestyle Masculino</title>
+    <meta name="description" content="Barbería premium en Valencia. Cortes, barba, cejas, decoloración y limpieza facial. Tienda, librería y podcast. Reserva tu cita en SKY CLUB." />
+    <meta name="author" content="SKY CLUB" />
+    <meta name="keywords" content="barbería valencia, barbería premium valencia, corte de pelo valencia, decoloración hombre valencia, sky club, lifestyle masculino" />
+    <link rel="canonical" href="https://void-velvet.lovable.app/" />
+
+    <meta property="og:title" content="SKY CLUB Valencia | Barbería Premium & Lifestyle Masculino" />
+    <meta property="og:description" content="Barbería premium en Valencia. Rituales de acero, cuidado masculino y un ecosistema completo de elevación. Sky is the limit." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://void-velvet.lovable.app/" />
+    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta property="og:locale" content="es_ES" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@SkyClub" />
+    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+    <!-- Schema.org LocalBusiness for local SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "HairSalon",
+      "name": "SKY CLUB",
+      "image": "https://lovable.dev/opengraph-image-p98pqg.png",
+      "url": "https://void-velvet.lovable.app/",
+      "telephone": "+34677263672",
+      "priceRange": "€€",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Carrer Just Ramírez 2",
+        "addressLocality": "Valencia",
+        "postalCode": "46006",
+        "addressCountry": "ES"
+      },
+      "geo": { "@type": "GeoCoordinates", "latitude": 39.4669, "longitude": -0.3808 },
+      "openingHoursSpecification": [{
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+        "opens": "10:00",
+        "closes": "20:00"
+      }]
+    }
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet">
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+
+    <!-- SVG Gold Foil filter for high fidelity metallic reflection -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="position: absolute; width: 0; height: 0;" width="0" height="0">
+      <defs>
+        <filter id="gold-foil-specular" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="1.5" result="blur" />
+          <feSpecularLighting in="blur" specularExponent="30" specularConstant="1.5" lighting-color="#ffeeb8" result="specular">
+            <feDistantLight azimuth="225" elevation="45" id="specular-light" />
+          </feSpecularLighting>
+          <feComposite operator="in" in="specular" in2="SourceGraphic" result="composite" />
+          <feComposite operator="arithmetic" k1="0" k2="1" k3="1" k4="0" in="SourceGraphic" in2="composite" />
+        </filter>
+      </defs>
+    </svg>
+  </body>
+</html>
