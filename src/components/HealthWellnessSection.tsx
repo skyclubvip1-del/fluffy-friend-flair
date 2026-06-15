@@ -508,10 +508,10 @@ const BreathingWidget = () => {
           <div className="flex-1 space-y-3">
             <div>
               <p className="font-body text-xs text-white/40 leading-relaxed">
-                Inspira 4s Â· SostÃ©n 7s Â· Exhala 8s
+                Inspira 4s · Sostén 7s · Exhala 8s
               </p>
               <p className="font-mono text-[10px] text-white/20 mt-1">
-                TÃ©cnica del Dr. Andrew Weil para calmar el sistema nervioso.
+                Técnica del Dr. Andrew Weil para calmar el sistema nervioso.
               </p>
             </div>
             <button
@@ -527,9 +527,57 @@ const BreathingWidget = () => {
   );
 };
 
-/* â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    MAIN SECTION COMPONENT
-   â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•�â•� */
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+const highlightKeywords = (text: string) => {
+  const keywords = [
+    "neurociencia aplicada",
+    "coaching cognitivo",
+    "resiliencia emocional",
+    "Tratamientos faciales",
+    "tecnología dermocosmética",
+    "tecnologÃ­a dermocosmÃ©tica",
+    "Consultoría nutricional",
+    "ConsultorÃ­a nutricional",
+    "biología única",
+    "biologÃ­a Ãºnica",
+    "higiene del sueño",
+    "higiene del sueÃ±o",
+    "regeneración celular",
+    "regeneraciÃ³n celular",
+    "Acompañamiento emocional",
+    "AcompaÃ±amiento emocional",
+    "vulnerabilidad",
+    "amor propio",
+    "sistema operativo",
+    "meditación guiada",
+    "meditaciÃ³n guiada",
+    "aromaterapia",
+    "breathwork",
+    "santuario de bienestar",
+    "Santuario de Bienestar",
+    "flotación sensorial",
+    "flotaciÃ³n sensorial",
+  ];
+
+  const escapedKeywords = keywords.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  const regex = new RegExp(`(${escapedKeywords})`, 'gi');
+  
+  const parts = text.split(regex);
+  return parts.map((part, index) => {
+    const isKeyword = keywords.some(k => k.toLowerCase() === part.toLowerCase());
+    if (isKeyword) {
+      return (
+        <span key={index} className="gold-shine-text font-semibold">
+          {part}
+        </span>
+      );
+    }
+    return part;
+  });
+};
 
 const HealthWellnessSection = () => {
   const [activePillar, setActivePillar] = useState(wellnessPillars[0].id);
@@ -546,7 +594,7 @@ const HealthWellnessSection = () => {
 
   return (
     <section id="bienestar" className="relative py-28 md:py-40 px-6 bg-void overflow-hidden">
-      {/* â•�â•�â•� AMBIENT BACKGROUND â•�â•�â•� */}
+      {/* ─── AMBIENT BACKGROUND ─── */}
       {/* Gold nebula */}
       <div
         className="absolute pointer-events-none transition-all duration-[1500ms]"
@@ -579,7 +627,7 @@ const HealthWellnessSection = () => {
       <div className="absolute top-1/2 left-1/2 w-1 h-1 rounded-full bg-white/10 animate-orbit pointer-events-none" style={{ animationDuration: "40s" }} />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* â•�â•�â•� HEADER â•�â•�â•� */}
+        {/* ─── HEADER ─── */}
         <motion.div
           initial={{ opacity: 0, y: 35 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -597,8 +645,8 @@ const HealthWellnessSection = () => {
           </h2>
 
           <p className="font-body text-white/35 max-w-xl mx-auto leading-relaxed text-balance text-[15px]">
-            Un espacio sagrado donde cuidar de ti no es un lujo â€” es una necesidad.
-            Cinco pilares para restaurar tu equilibrio mental, emocional y fÃ­sico.
+            Un espacio sagrado donde cuidar de ti no es un lujo — es una necesidad.
+            Cinco pilares para restaurar tu equilibrio mental, emocional y físico.
           </p>
 
           {/* Rotating quote */}
@@ -616,7 +664,7 @@ const HealthWellnessSection = () => {
                   "{quotes[quoteIdx].text}"
                 </p>
                 <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-gold-base/20 mt-1">
-                  â€” {quotes[quoteIdx].author}
+                  — {quotes[quoteIdx].author}
                 </span>
               </motion.div>
             </AnimatePresence>
@@ -626,7 +674,7 @@ const HealthWellnessSection = () => {
           <div className="mt-10 h-px max-w-xs mx-auto bg-gradient-to-r from-transparent via-gold-base/15 to-transparent" />
         </motion.div>
 
-        {/* â•�â•�â•� PILLAR SELECTOR â•�â•�â•� */}
+        {/* ─── PILLAR SELECTOR ─── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -641,54 +689,53 @@ const HealthWellnessSection = () => {
               <motion.button
                 key={p.id}
                 onClick={() => setActivePillar(p.id)}
-                whileHover={{ scale: 1.06, y: -2 }}
+                whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className={`relative flex flex-col items-center gap-1.5 px-5 py-3.5 rounded-2xl border transition-all duration-500 min-w-[76px] ${
-                  active
-                    ? "bg-gold-base/8 border-gold-base/35 shadow-[0_0_30px_rgba(212,175,55,0.08)]"
-                    : "bg-white/[0.015] border-white/[0.05] hover:border-white/10 hover:bg-white/[0.025]"
-                }`}
+                className="relative flex flex-col items-center gap-1.5 px-5 py-3.5 rounded-2xl min-w-[76px] cursor-pointer transition-all duration-300 z-10"
               >
-                <Icon className={`w-[18px] h-[18px] transition-colors duration-500 ${active ? "text-gold-base" : "text-white/25"}`} />
-                <span className={`font-mono text-[8px] uppercase tracking-[0.15em] transition-colors duration-500 ${active ? "text-white/70" : "text-white/20"}`}>
-                  {p.title.split(" ")[0]}
-                </span>
-                {/* Active dot */}
+                {/* Active sliding background highlight */}
                 {active && (
                   <motion.div
-                    layoutId="pillar-dot"
-                    className="absolute -bottom-1.5 w-1 h-1 rounded-full bg-gold-base"
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    layoutId="active-pillar-indicator"
+                    className="absolute inset-0 rounded-2xl bg-gold-base/10 border border-gold-base/40 z-[-1] shadow-[0_0_20px_rgba(212,175,55,0.08)]"
+                    transition={{ type: "spring", stiffness: 350, damping: 25 }}
                   />
                 )}
+                {!active && (
+                  <div className="absolute inset-0 rounded-2xl border border-white/[0.03] bg-white/[0.005] z-[-1]" />
+                )}
+                <Icon className={`w-[18px] h-[18px] transition-colors duration-300 ${active ? "text-gold-base filter drop-shadow-[0_0_5px_rgba(212,163,89,0.5)]" : "text-white/25"}`} />
+                <span className={`font-mono text-[8px] uppercase tracking-[0.15em] transition-colors duration-300 ${active ? "text-white/85" : "text-white/20"}`}>
+                  {p.title.split(" ")[0]}
+                </span>
               </motion.button>
             );
           })}
         </motion.div>
 
-        {/* â•�â•�â•� CONTENT AREA â•�â•�â•� */}
+        {/* ─── CONTENT AREA ─── */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activePillar}
-            initial={{ opacity: 0, y: 25 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
           >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
-              {/* â”€â”€ LEFT COLUMN â”€â”€ */}
+              {/* ── LEFT COLUMN ── */}
               <div className="lg:col-span-5 space-y-5">
                 {/* Hero Image */}
                 <div className="relative group rounded-2xl overflow-hidden border border-white/[0.08] aspect-[4/3]">
                   <motion.img
-                    key={current.heroImage}
-                    src={current.heroImage}
-                    alt={current.title}
-                    loading="lazy"
-                    initial={{ scale: 1.08, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-                    className="w-full h-full object-cover transition-transform duration-[1200ms] group-hover:scale-105"
+                     key={current.heroImage}
+                     src={current.heroImage}
+                     alt={current.title}
+                     loading="lazy"
+                     initial={{ scale: 1.08, opacity: 0 }}
+                     animate={{ scale: 1, opacity: 1 }}
+                     transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                     className="w-full h-full object-cover transition-transform duration-[1200ms] group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-void via-void/25 to-transparent" />
                   <div className={`absolute inset-0 bg-gradient-to-br ${current.gradient} opacity-50 transition-opacity duration-700`} />

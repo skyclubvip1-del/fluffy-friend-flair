@@ -1,9 +1,13 @@
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import NoiseOverlay from "@/components/NoiseOverlay";
 import FluidGoldCanvas from "@/components/FluidGoldCanvas";
 import MidasTouch from "@/components/MidasTouch";
+import Navbar from "@/components/Navbar";
 import FloatingNav from "@/components/FloatingNav";
 import Hero from "@/components/Hero";
 import BentoGrid from "@/components/BentoGrid";
+import StatsSection from "@/components/StatsSection";
 import ServiceSections from "@/components/ServiceSections";
 import HealthWellnessSection from "@/components/HealthWellnessSection";
 import MembershipSection from "@/components/MembershipSection";
@@ -15,10 +19,34 @@ import TransformationSlider from "@/components/TransformationSlider";
 import ConciergeButton from "@/components/ConciergeButton";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 import Footer from "@/components/Footer";
+import GoldDivider from "@/components/GoldDivider";
+import VaultLoader from "@/components/VaultLoader";
 
 const Index = () => {
+  const [isLoaded, setIsLoaded] = useState(() => {
+    return sessionStorage.getItem("vault-opened") === "true";
+  });
+
   return (
     <main className="relative bg-void min-h-screen overflow-x-hidden">
+      {/* Vault Entrance Loader - Plays once per session */}
+      <AnimatePresence mode="wait">
+        {!isLoaded && (
+          <VaultLoader onComplete={() => setIsLoaded(true)} />
+        )}
+      </AnimatePresence>
+
+      {/* Global SVG Filters for Liquid / Gooey effects */}
+      <svg className="hidden w-0 h-0 absolute pointer-events-none">
+        <defs>
+          <filter id="gooey-gold">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+          </filter>
+        </defs>
+      </svg>
+
       {/* Interactive WebGL Fluid Background */}
       <FluidGoldCanvas />
 
@@ -28,47 +56,81 @@ const Index = () => {
       {/* Midas Touch interactive cursor & blood-gold clicks */}
       <MidasTouch />
 
-      {/* Floating Island Navigation */}
-      <FloatingNav />
+      {isLoaded && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
+          {/* Desktop Sticky Header */}
+          <Navbar />
 
-      {/* Hero Section - The Gate */}
-      <Hero />
+          {/* Floating Island Navigation (Mobile only now) */}
+          <FloatingNav />
 
-      {/* Bento Grid Hub - The Constellation */}
-      <BentoGrid />
+          {/* Hero Section - The Gate */}
+          <Hero />
 
-      {/* Service Sections - Detailed Content */}
-      <ServiceSections />
+          <GoldDivider />
 
-      {/* Marquee - Lookbook Infinito */}
-      <Marquee />
+          {/* Bento Grid Hub - The Constellation */}
+          <BentoGrid />
 
-      {/* Salud & Bienestar - Santuario de Bienestar */}
-      <HealthWellnessSection />
+          {/* Stats Panel - Key Indicators */}
+          <StatsSection />
 
-      {/* Membership Section - The Altar */}
-      <MembershipSection />
+          <GoldDivider />
 
-      {/* Testimonials - Proof of Ascension */}
-      <Testimonials />
+          {/* Service Sections - Detailed Content */}
+          <ServiceSections />
 
-      {/* Podcast Visualizer - Live Signal */}
-      <PodcastVisualizer />
+          <GoldDivider />
 
-      {/* Community Teaser - The Locker Room */}
-      <CommunityTeaser />
+          {/* Marquee - Lookbook Infinito */}
+          <Marquee />
 
-      {/* Transformation Slider - The Mirror */}
-      <TransformationSlider />
+          <GoldDivider />
 
-      {/* Footer - Base Operations */}
-      <Footer />
+          {/* Salud & Bienestar - Santuario de Bienestar */}
+          <HealthWellnessSection />
 
-      {/* Concierge FAB */}
-      <ConciergeButton />
+          <GoldDivider />
 
-      {/* WhatsApp quick reserve */}
-      <WhatsAppFloat />
+          {/* Membership Section - The Altar */}
+          <MembershipSection />
+
+          <GoldDivider />
+
+          {/* Testimonials - Proof of Ascension */}
+          <Testimonials />
+
+          <GoldDivider />
+
+          {/* Podcast Visualizer - Live Signal */}
+          <PodcastVisualizer />
+
+          <GoldDivider />
+
+          {/* Community Teaser - The Locker Room */}
+          <CommunityTeaser />
+
+          <GoldDivider />
+
+          {/* Transformation Slider - The Mirror */}
+          <TransformationSlider />
+
+          <GoldDivider />
+
+          {/* Footer - Base Operations */}
+          <Footer />
+
+          {/* Concierge FAB */}
+          <ConciergeButton />
+
+          {/* WhatsApp quick reserve */}
+          <WhatsAppFloat />
+        </motion.div>
+      )}
     </main>
   );
 };

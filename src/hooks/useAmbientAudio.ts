@@ -94,6 +94,28 @@ class AudioManager {
     }, 900);
   }
 
+  // Synthesis of a subtle analog click
+  public playClick() {
+    if (!this.ctx || this.ctx.state === "suspended") return;
+    const now = this.ctx.currentTime;
+
+    const osc = this.ctx.createOscillator();
+    const gainNode = this.ctx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(120, now);
+    osc.frequency.exponentialRampToValueAtTime(80, now + 0.04);
+
+    gainNode.gain.setValueAtTime(0.08, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+
+    osc.connect(gainNode);
+    gainNode.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.05);
+  }
+
   // Synthesis of 3D metallic chimes using FM Synthesis (frequency modulation)
   public playChime(freq: number, isDeep: boolean = false) {
     if (!this.ctx || this.ctx.state === "suspended") return;
@@ -170,9 +192,15 @@ export const useAmbientAudio = () => {
       audioManager.playChime(freq, isDeep);
     };
 
+    const handlePlayClick = () => {
+      audioManager.playClick();
+    };
+
     window.addEventListener("play-audio-chime", handlePlayChime as EventListener);
+    window.addEventListener("play-audio-click", handlePlayClick);
     return () => {
       window.removeEventListener("play-audio-chime", handlePlayChime as EventListener);
+      window.removeEventListener("play-audio-click", handlePlayClick);
     };
   }, []);
 

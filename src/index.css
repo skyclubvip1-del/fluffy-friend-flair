@@ -1033,3 +1033,197 @@
   0% { opacity: 0.3; }
   100% { opacity: 0.7; }
 }
+
+/* --- ADVANCED LUXURY UTILITIES --- */
+.gold-shine-text {
+  position: relative;
+  background: linear-gradient(
+    120deg,
+    #d4a359 0%,
+    #d4a359 35%,
+    #fffbf0 50%,
+    #d4a359 65%,
+    #d4a359 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gold-shine 4s linear infinite;
+}
+
+@keyframes gold-shine {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+.shine-overlay-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-overlay-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 100%
+  );
+  transform: skewX(-25deg);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.shine-overlay-container:hover::before {
+  animation: shine-sweep 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes shine-sweep {
+  0% { left: -150%; }
+  100% { left: 150%; }
+}
+
+.border-drawing {
+  position: relative;
+  overflow: hidden;
+}
+
+.border-drawing::before,
+.border-drawing::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 1px solid transparent;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.border-drawing::before {
+  top: 0;
+  left: 0;
+}
+
+.border-drawing::after {
+  bottom: 0;
+  right: 0;
+}
+
+.border-drawing:hover::before {
+  width: 100%;
+  height: 100%;
+  border-top-color: hsl(var(--gold-base));
+  border-right-color: hsl(var(--gold-base));
+  transition: width 0.15s ease-out, height 0.15s ease-out 0.15s;
+}
+
+.border-drawing:hover::after {
+  width: 100%;
+  height: 100%;
+  border-bottom-color: hsl(var(--gold-base));
+  border-left-color: hsl(var(--gold-base));
+  transition: border-color 0s ease-out 0.3s, width 0.15s ease-out 0.3s, height 0.15s ease-out 0.45s;
+}
+
+.word-reveal-container {
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+.word-reveal-item {
+  display: inline-block;
+  transform: translateY(100%);
+  animation: word-reveal-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes word-reveal-up {
+  0% { transform: translateY(100%); }
+  100% { transform: translateY(0); }
+}
+
+.gold-glow-pulse {
+  animation: gold-glow-pulse-anim 3s ease-in-out infinite;
+}
+
+@keyframes gold-glow-pulse-anim {
+  0%, 100% {
+    box-shadow: 0 0 15px hsl(var(--gold-base) / 0.15);
+  }
+  50% {
+    box-shadow: 0 0 30px hsl(var(--gold-base) / 0.45), 0 0 50px hsl(var(--gold-base) / 0.15);
+  }
+}
+
+.gold-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.gold-ripple::after {
+  content: "";
+  background: radial-gradient(circle, hsl(var(--gold-light) / 0.4) 0%, transparent 70%);
+  display: block;
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  transition: transform 0.5s, opacity 1s;
+  pointer-events: none;
+}
+
+.gold-ripple:active::after {
+  transform: translate(-50%, -50%) scale(2);
+  opacity: 1;
+  transition: 0s;
+}
+
+.glow-pulse-inset {
+  animation: glow-pulse-inset-anim 3.5s ease-in-out infinite;
+}
+
+@keyframes glow-pulse-inset-anim {
+  0%, 100% {
+    box-shadow: inset 0 0 8px hsl(var(--gold-base) / 0.25);
+  }
+  50% {
+    box-shadow: inset 0 0 20px hsl(var(--gold-base) / 0.6), 0 0 8px hsl(var(--gold-base) / 0.15);
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-delay: -1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    background-attachment: initial !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+  .gold-dust-container,
+  canvas,
+  .gold-particles-canvas {
+    display: none !important;
+  }
+}
+

@@ -1,6 +1,28 @@
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useRef, useState, useMemo } from "react";
 import { ArrowDown, Sparkles } from "lucide-react";
+import GoldParticlesCanvas from "./GoldParticlesCanvas";
+
+const titleContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.4
+    }
+  }
+};
+
+const wordVariants = {
+  hidden: { y: "100%", opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
+  }
+};
+
 
 // Generate stable star positions
 const generateStars = (count: number) => {
@@ -103,6 +125,8 @@ const Hero = () => {
     >
       {/* Atmospheric Background */}
       <div className="absolute inset-0 bg-void" />
+      <GoldParticlesCanvas />
+
 
       {/* Starfield */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -242,36 +266,55 @@ const Hero = () => {
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
-            className="relative font-display font-bold text-gold-midas tracking-tight animate-neon-flicker animate-glitch metallic-gold"
+            variants={titleContainerVariants}
+            initial="hidden"
+            animate="visible"
+            className="relative font-display font-bold tracking-tight metallic-gold flex flex-col items-center justify-center text-center"
             style={{ fontSize: "clamp(3.5rem, 11vw, 9.5rem)", lineHeight: 0.85, letterSpacing: "-0.04em" }}
           >
-            SKY
-            <br />
-            <span className="relative inline-block text-gold-midas">
-              CLUB
+            <div className="overflow-hidden block h-[1.15em] py-1">
+              <motion.span 
+                variants={wordVariants} 
+                className="inline-block text-gold-midas gold-shine-text animate-neon-flicker animate-glitch"
+              >
+                SKY
+              </motion.span>
+            </div>
+            <div className="overflow-hidden block h-[1.15em] py-1 relative">
+              <motion.span 
+                variants={wordVariants} 
+                className="inline-block text-gold-midas gold-shine-text animate-neon-flicker animate-glitch"
+              >
+                CLUB
+              </motion.span>
               <motion.span
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ delay: 1.4, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute -bottom-2 left-0 w-full h-[2.5px] bg-gradient-to-r from-gold-base/30 via-white to-gold-base/30 origin-left shadow-[0_0_8px_rgba(212,163,89,0.5)]"
+                className="absolute -bottom-2 left-0 w-full h-[2.5px] bg-gradient-to-r from-gold-base/30 via-white to-gold-base/30 origin-center shadow-[0_0_8px_rgba(212,163,89,0.5)]"
               />
-            </span>
+            </div>
           </motion.h1>
         </motion.div>
 
         {/* Subtitle */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9, duration: 0.8 }}
-          className="mt-8 font-display font-semibold text-2xl md:text-3xl tracking-[0.2em] uppercase text-gold-light"
-          style={{ textShadow: "0 2px 15px rgba(212,163,89,0.35)" }}
-        >
-          Sky is the limit
-        </motion.p>
+        <div className="relative inline-block mt-8 pb-3">
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9, duration: 0.8 }}
+            className="font-display font-semibold text-2xl md:text-3xl tracking-[0.2em] uppercase text-gold-light"
+            style={{ textShadow: "0 2px 15px rgba(212,163,89,0.35)" }}
+          >
+            Sky is the limit
+          </motion.p>
+          <motion.span
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={{ scaleX: 1, opacity: 1 }}
+            transition={{ delay: 1.1, duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute bottom-0 left-0 w-full h-[1px] bg-gold-base/40 origin-left"
+          />
+        </div>
 
         {/* Gandhi Quote */}
         <motion.p
@@ -301,11 +344,11 @@ const Hero = () => {
             style={{ x: buttonSpringX, y: buttonSpringY }}
             onClick={() => document.getElementById('vision')?.scrollIntoView({ behavior: 'smooth' })}
             className={`
-              relative px-8 py-4 rounded-full font-display font-bold text-sm uppercase tracking-widest
-              border transition-all duration-500 overflow-hidden cursor-pointer
+              relative px-8 py-4 rounded-md font-display font-bold text-sm uppercase tracking-widest
+              border transition-all duration-500 overflow-hidden cursor-pointer border-drawing gold-ripple
               ${isButtonHovered
                 ? 'bg-gold-base text-void border-gold-base shadow-[0_0_20px_rgba(212,163,89,0.6)] scale-[1.04]'
-                : 'bg-transparent text-gold-light border-gold-base/35 hover:border-gold-base/60'
+                : 'bg-transparent text-gold-light border-gold-base/35 hover:border-gold-base/60 glow-pulse-inset'
               }
             `}
           >

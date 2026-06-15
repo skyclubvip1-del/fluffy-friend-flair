@@ -4,6 +4,8 @@ const FluidGoldCanvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
   const targetMouseRef = useRef({ x: 0, y: 0 });
+  const scrollSpeedRef = useRef(0);
+  const lastScrollYRef = useRef(0);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -14,8 +16,21 @@ const FluidGoldCanvas = () => {
       };
     };
 
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const diff = currentScrollY - lastScrollYRef.current;
+      // Add scroll impulse
+      scrollSpeedRef.current += diff * 0.45;
+      lastScrollYRef.current = currentScrollY;
+    };
+
     window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -45,12 +60,13 @@ const FluidGoldCanvas = () => {
       }
     `;
 
-    // Fragment shader: Liquid Gold Domain Warping
+    // Fragment shader: Liquid Gold Domain Warping with Scroll Speed Dynamics
     const fsSource = `
       precision mediump float;
       uniform vec2 u_resolution;
       uniform vec2 u_mouse;
       uniform float u_time;
+      uniform float u_scroll_speed;
 
       float hash(vec2 p) {
         return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
@@ -98,12 +114,17 @@ const FluidGoldCanvas = () => {
         q.y = fbm(st + vec2(1.0));
 
         vec2 r = vec2(0.0);
-        // Warp coordinates near cursor position
+        
+        // Warp coordinates near cursor position + apply scroll speed dynamics
         float force = smoothstep(0.38, 0.0, dist) * 0.18;
         vec2 dir = st - m;
         
-        r.x = fbm(st + 1.0 * q + vec2(1.7, 9.2) + 0.04 * u_time + dir * force);
-        r.y = fbm(st + 1.0 * q + vec2(8.3, 2.8) + 0.03 * u_time);
+        // Scroll speed deformation (vertical offset + wavy side-shifting)
+        float scrollOffset = u_scroll_speed * 0.0035;
+        vec2 scrollWarp = vec2(sin(st.x * 5.0 + u_time) * scrollOffset * 0.4, scrollOffset);
+        
+        r.x = fbm(st + 1.0 * q + vec2(1.7, 9.2) + 0.04 * u_time + dir * force + scrollWarp.x);
+        r.y = fbm(st + 1.0 * q + vec2(8.3, 2.8) + 0.03 * u_time - scrollWarp.y);
 
         float f = fbm(st + r);
 
@@ -178,6 +199,7 @@ const FluidGoldCanvas = () => {
     const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
     const mouseLocation = gl.getUniformLocation(program, "u_mouse");
     const timeLocation = gl.getUniformLocation(program, "u_time");
+    const scrollSpeedLocation = gl.getUniformLocation(program, "u_scroll_speed");
 
     let animationId = 0;
     const startTime = Date.now();
@@ -188,11 +210,15 @@ const FluidGoldCanvas = () => {
       mouseRef.current.x += (targetMouseRef.current.x - mouseRef.current.x) * 0.08;
       mouseRef.current.y += (targetMouseRef.current.y - mouseRef.current.y) * 0.08;
 
+      // Slowly damp the scroll speed impulse back to 0
+      scrollSpeedRef.current += (0 - scrollSpeedRef.current) * 0.06;
+
       const elapsed = (Date.now() - startTime) / 1000;
 
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
       gl.uniform2f(mouseLocation, mouseRef.current.x, mouseRef.current.y);
       gl.uniform1f(timeLocation, elapsed);
+      gl.uniform1f(scrollSpeedLocation, scrollSpeedRef.current);
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
 
@@ -221,3 +247,4 @@ const FluidGoldCanvas = () => {
 };
 
 export default FluidGoldCanvas;
+

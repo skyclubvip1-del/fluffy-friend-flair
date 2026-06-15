@@ -46,14 +46,14 @@ const Marquee = () => {
                 style={{ transform: `translateZ(${depthValues[i % 3]}px)` }}
               >
                 {/* Main Image */}
-                <div className="relative w-full h-32 overflow-hidden">
+                <div className="relative w-full h-32 overflow-hidden shine-overlay-container">
                   <img
                     src={src}
                     alt=""
                     loading="lazy"
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:saturate-[1.3] transition-all duration-300"
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:saturate-[1.3] group-hover:scale-108 transition-all duration-500"
                   />
-                  <div className="absolute inset-0 bg-void/50 group-hover:bg-transparent transition-colors duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-tr from-black via-[#00000030] to-[hsl(var(--gold-base))/0.15] opacity-80 group-hover:opacity-20 transition-opacity duration-500" />
                   {/* Border Beam on hover */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 border-beam pointer-events-none" />
                 </div>
@@ -89,14 +89,14 @@ const Marquee = () => {
                 style={{ transform: `translateZ(${depthValues[i % 3]}px)` }}
               >
                 {/* Main Image */}
-                <div className="relative w-full h-32 overflow-hidden">
+                <div className="relative w-full h-32 overflow-hidden shine-overlay-container">
                   <img
                     src={src}
                     alt=""
                     loading="lazy"
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:saturate-[1.3] transition-all duration-300"
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:saturate-[1.3] group-hover:scale-108 transition-all duration-500"
                   />
-                  <div className="absolute inset-0 bg-void/50 group-hover:bg-transparent transition-colors duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-tr from-black via-[#00000030] to-[hsl(var(--gold-base))/0.15] opacity-80 group-hover:opacity-20 transition-opacity duration-500" />
                   {/* Border Beam on hover */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 border-beam pointer-events-none" />
                 </div>

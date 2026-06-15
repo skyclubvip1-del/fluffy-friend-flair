@@ -7,12 +7,34 @@ interface BentoCardProps {
   subtitle: string;
   image: string;
   className?: string;
-  delay?: number;
   scrollTo?: string;
   externalLink?: string;
+  number: string;
 }
 
-const BentoCard = ({ title, subtitle, image, className = "", delay = 0, scrollTo, externalLink }: BentoCardProps) => {
+const cardVariants = {
+  hidden: { opacity: 0, y: 30 },
+  show: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 15
+    }
+  }
+};
+
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const BentoCard = ({ title, subtitle, image, className = "", scrollTo, externalLink, number }: BentoCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -22,6 +44,8 @@ const BentoCard = ({ title, subtitle, image, className = "", delay = 0, scrollTo
   const springConfig = { damping: 18, stiffness: 180 };
   const rotateX = useSpring(useTransform(mouseY, [-100, 100], [15, -15]), springConfig);
   const rotateY = useSpring(useTransform(mouseX, [-100, 100], [-15, 15]), springConfig);
+  const bgX = useSpring(useTransform(mouseX, [-100, 100], [10, -10]), springConfig);
+  const bgY = useSpring(useTransform(mouseY, [-100, 100], [10, -10]), springConfig);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!cardRef.current) return;
@@ -59,29 +83,39 @@ const BentoCard = ({ title, subtitle, image, className = "", delay = 0, scrollTo
     if (externalLink) {
       window.open(externalLink, "_blank", "noopener,noreferrer");
     } else if (scrollTo) {
-      document.getElementById(scrollTo)?.scrollIntoView({ behavior: "smooth" });
+      const target = document.getElementById(scrollTo);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth" });
+      }
     }
   };
 
   return (
     <motion.div
       ref={cardRef}
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
+      variants={cardVariants}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
+      whileHover={{ y: -8, transition: { duration: 0.3, ease: "easeOut" } }}
       style={{
         rotateX,
         rotateY,
         transformPerspective: 1000,
         transformStyle: "preserve-3d",
       }}
-      className={`group relative bg-void border border-gold-base/20 rounded-2xl overflow-hidden cursor-pointer transition-shadow duration-700 hover:shadow-[0_25px_70px_rgba(212,163,89,0.3)] min-h-[220px] border-beam ${className} preserve-3d`}
+      className={`group relative bg-void border border-gold-base/20 rounded-2xl overflow-hidden cursor-pointer transition-shadow duration-700 hover:shadow-[0_25px_70px_rgba(212,163,89,0.3)] min-h-[220px] border-beam holo-border ${className} preserve-3d`}
     >
+      {/* Order Number */}
+      <motion.span 
+        animate={isHovered ? { scale: 1.1, rotate: 5, color: "#ffeeb8" } : { scale: 1, rotate: 0, color: "rgba(212, 163, 89, 0.5)" }}
+        transition={{ type: "spring", stiffness: 300, damping: 15 }}
+        className="absolute top-6 right-6 font-mono text-xs tracking-widest z-20 font-bold"
+      >
+        {number}
+      </motion.span>
+
       {/* Diagonal hatching pattern overlay */}
       <div
         className="absolute inset-0 pointer-events-none z-[5]"
@@ -109,7 +143,10 @@ const BentoCard = ({ title, subtitle, image, className = "", delay = 0, scrollTo
       />
 
       {/* Background Image */}
-      <div className="absolute inset-0 transition-all duration-700 ease-out z-0">
+      <motion.div 
+        style={{ x: bgX, y: bgY }}
+        className="absolute inset-0 transition-all duration-700 ease-out z-0"
+      >
         <img
           src={image}
           alt={title}
@@ -120,7 +157,7 @@ const BentoCard = ({ title, subtitle, image, className = "", delay = 0, scrollTo
           `}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-void via-void/50 to-transparent" />
-      </div>
+      </motion.div>
 
       {/* Content */}
       <div 
@@ -138,14 +175,16 @@ const BentoCard = ({ title, subtitle, image, className = "", delay = 0, scrollTo
         </div>
 
         {/* Arrow Button */}
-        <div 
+        <motion.div 
           className="absolute bottom-6 right-6 md:bottom-8 md:right-8 transition-transform duration-500"
           style={{ transform: isHovered ? "translateZ(40px)" : "translateZ(0px)" }}
+          animate={isHovered ? { scale: 1.1, rotate: 5 } : { scale: 1, rotate: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 15 }}
         >
           <div className="w-10 h-10 rounded-full border border-gold-base/40 bg-gold-base/5 backdrop-blur-sm flex items-center justify-center transition-all duration-500 group-hover:bg-gold-gradient group-hover:border-gold-base group-hover:shadow-[0_0_20px_rgba(212,163,89,0.5)]">
             <ArrowUpRight className="w-4.5 h-4.5 text-gold-base transition-colors duration-500 group-hover:text-void" />
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Hover Border Light - Gold Frame */}
@@ -200,7 +239,7 @@ const BentoGrid = () => {
   };
 
   return (
-    <section id="vision" className="relative py-24 md:py-32 px-6 bg-void">
+    <section id="vision" className="relative py-24 md:py-32 px-6 bg-void animate-fade-in">
       {/* Section Header */}
       <div className="max-w-7xl mx-auto mb-16">
         <motion.div
@@ -223,15 +262,21 @@ const BentoGrid = () => {
       </div>
 
       {/* Bento Grid */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 md:auto-rows-[180px]">
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-100px" }}
+        className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 md:auto-rows-[180px]"
+      >
         {/* Barbershop - Large */}
         <BentoCard
           title="LA BARBERÍA"
           subtitle="Rituales de Acero"
           image="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=800&q=80"
           className="md:col-span-2 md:row-span-2"
-          delay={0}
           scrollTo="barberia"
+          number="01"
         />
 
         {/* Library */}
@@ -240,8 +285,8 @@ const BentoGrid = () => {
           subtitle="Arquitectura Mental"
           image="https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=600&q=80"
           className="md:col-span-1 md:row-span-1"
-          delay={0.1}
           scrollTo="libreria"
+          number="02"
         />
 
         {/* Tienda */}
@@ -250,17 +295,14 @@ const BentoGrid = () => {
           subtitle="Estilo & Exclusividad"
           image="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&q=80"
           className="md:col-span-1 md:row-span-2"
-          delay={0.2}
           scrollTo="tienda"
+          number="03"
         />
 
         {/* Podcast with Audio Wave */}
         <motion.div
           ref={podcastCardRef}
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, delay: 0.3 }}
+          variants={cardVariants}
           onMouseMove={handlePodcastMouseMove}
           onMouseEnter={() => {
             setIsPodcastHovered(true);
@@ -271,15 +313,30 @@ const BentoGrid = () => {
             );
           }}
           onMouseLeave={handlePodcastMouseLeave}
-          onClick={() => document.getElementById('podcast-section')?.scrollIntoView({ behavior: 'smooth' })}
+          onClick={() => {
+            const target = document.getElementById('podcast-section');
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+          whileHover={{ y: -8, transition: { duration: 0.3, ease: "easeOut" } }}
           style={{
             rotateX: podcastRotateX,
             rotateY: podcastRotateY,
             transformPerspective: 1000,
             transformStyle: "preserve-3d",
           }}
-          className="group relative bg-void border border-gold-base/20 rounded-2xl overflow-hidden cursor-pointer md:col-span-1 md:row-span-2 hover:shadow-[0_25px_70px_rgba(212,163,89,0.3)] transition-shadow duration-700 border-beam"
+          className="group relative bg-void border border-gold-base/20 rounded-2xl overflow-hidden cursor-pointer md:col-span-1 md:row-span-2 hover:shadow-[0_25px_70px_rgba(212,163,89,0.3)] transition-shadow duration-700 border-beam holo-border"
         >
+          {/* Order Number */}
+          <motion.span 
+            animate={isPodcastHovered ? { scale: 1.1, rotate: 5, color: "#ffeeb8" } : { scale: 1, rotate: 0, color: "rgba(212, 163, 89, 0.5)" }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            className="absolute top-6 right-6 font-mono text-xs tracking-widest z-20 font-bold"
+          >
+            04
+          </motion.span>
+
           {/* Diagonal hatching pattern overlay */}
           <div
             className="absolute inset-0 pointer-events-none z-[5]"
@@ -316,6 +373,7 @@ const BentoGrid = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-void via-void/50 to-transparent" />
           </div>
+          
           <div 
             className="relative z-20 h-full p-6 md:p-8 flex flex-col justify-end preserve-3d" 
             style={{ transform: "translateZ(10px)", transformStyle: "preserve-3d" }}
@@ -330,6 +388,18 @@ const BentoGrid = () => {
               </div>
               <p className="font-body text-xs md:text-sm text-gold-light/65 mt-1 tracking-wide font-medium">Frecuencia Élite</p>
             </div>
+
+            {/* Arrow Button */}
+            <motion.div 
+              className="absolute bottom-6 right-6 md:bottom-8 md:right-8 transition-transform duration-500"
+              style={{ transform: isPodcastHovered ? "translateZ(40px)" : "translateZ(0px)" }}
+              animate={isPodcastHovered ? { scale: 1.1, rotate: 5 } : { scale: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            >
+              <div className="w-10 h-10 rounded-full border border-gold-base/40 bg-gold-base/5 backdrop-blur-sm flex items-center justify-center transition-all duration-500 group-hover:bg-gold-gradient group-hover:border-gold-base group-hover:shadow-[0_0_20px_rgba(212,163,89,0.5)]">
+                <ArrowUpRight className="w-4.5 h-4.5 text-gold-base transition-colors duration-500 group-hover:text-void" />
+              </div>
+            </motion.div>
           </div>
           <div className="absolute inset-0 rounded-2xl border border-transparent group-hover:border-gold-base/50 pointer-events-none transition-all duration-500 z-30" />
         </motion.div>
@@ -340,12 +410,13 @@ const BentoGrid = () => {
           subtitle="Santuario de Bienestar"
           image="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80"
           className="md:col-span-2 md:row-span-1"
-          delay={0.5}
           scrollTo="bienestar"
+          number="05"
         />
-      </div>
+      </motion.div>
     </section>
   );
 };
 
 export default BentoGrid;
+

@@ -63,11 +63,11 @@ const FloatingNav = () => {
       initial={{ y: 100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 1.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40"
+      className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 md:hidden w-full max-w-[94vw] flex justify-center"
     >
       <motion.div
         transition={{ type: "spring", stiffness: 400, damping: 25 }}
-        className="backdrop-blur-2xl bg-[#0d0a06]/85 border border-gold-base/35 rounded-full px-3 py-2 flex items-center gap-0.5 shadow-[0_8px_32px_rgba(212,163,89,0.25)] hover:border-gold-base/50 transition-colors duration-500"
+        className="backdrop-blur-2xl bg-[#0d0a06]/85 border border-gold-base/35 rounded-full px-2 py-1.5 flex items-center gap-0.5 shadow-[0_8px_32px_rgba(212,163,89,0.25)] hover:border-gold-base/50 transition-colors duration-500 max-w-full overflow-x-auto no-scrollbar"
       >
         {navItems.map((item, index) => {
           const isActive = activeSection === item.href.replace("#", "");
@@ -93,11 +93,11 @@ const FloatingNav = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.4 + index * 0.08 }}
-              className={`group relative flex items-center justify-center w-11 h-11 rounded-full transition-all duration-300 ${isActive ? "bg-gold-base/20 shadow-[0_0_12px_rgba(212,163,89,0.35)]" : "hover:bg-white/5"
+              className={`group relative flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300 shrink-0 ${isActive ? "bg-gold-base/20 shadow-[0_0_12px_rgba(212,163,89,0.35)]" : "hover:bg-white/5"
                 }`}
             >
               <item.icon
-                className={`w-4.5 h-4.5 transition-colors duration-300 ${isActive ? "text-gold-base filter drop-shadow-[0_0_8px_rgba(212,163,89,0.85)]" : "text-gold-light/70 group-hover:text-gold-base"
+                className={`w-4 h-4 transition-colors duration-300 ${isActive ? "text-gold-base filter drop-shadow-[0_0_8px_rgba(212,163,89,0.85)]" : "text-gold-light/70 group-hover:text-gold-base"
                   }`}
               />
               {/* Active indicator dot */}
@@ -121,7 +121,7 @@ const FloatingNav = () => {
                 />
               )}
               {/* Tooltip */}
-              <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-void-deep/95 backdrop-blur-xl border border-gold-base/20 text-[9px] font-mono uppercase tracking-[0.15em] text-gold-light opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none shadow-md">
+              <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-void-deep/95 backdrop-blur-xl border border-gold-base/20 text-[9px] font-mono uppercase tracking-[0.15em] text-gold-light opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 whitespace-nowrap pointer-events-none shadow-lg shadow-black/80">
                 {item.label}
               </span>
             </motion.a>
@@ -129,7 +129,7 @@ const FloatingNav = () => {
         })}
 
         {/* Divider between Nav Items and Audio Toggle */}
-        <div className="w-[1px] h-6 bg-gold-base/25 mx-2" />
+        <div className="w-[1px] h-5 bg-gold-base/25 mx-1.5 shrink-0" />
 
         {/* Audio Toggle Button */}
         <motion.button
@@ -146,17 +146,17 @@ const FloatingNav = () => {
             y: -5,
           }}
           whileTap={{ scale: 0.95 }}
-          className={`group relative flex items-center justify-center w-11 h-11 rounded-full transition-all duration-300 cursor-pointer ${
+          className={`group relative flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300 cursor-pointer shrink-0 ${
             isPlaying ? "bg-gold-base/25 shadow-[0_0_12px_rgba(212,163,89,0.35)]" : "hover:bg-white/5"
           }`}
         >
           {isPlaying ? (
-            <Volume2 className="w-4.5 h-4.5 text-gold-base filter drop-shadow-[0_0_8px_rgba(212,163,89,0.85)] animate-pulse-slow" />
+            <Volume2 className="w-4 h-4 text-gold-base filter drop-shadow-[0_0_8px_rgba(212,163,89,0.85)] animate-pulse-slow" />
           ) : (
-            <VolumeX className="w-4.5 h-4.5 text-gold-light/60 group-hover:text-gold-base" />
+            <VolumeX className="w-4 h-4 text-gold-light/60 group-hover:text-gold-base" />
           )}
           {/* Tooltip */}
-          <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-void-deep/95 backdrop-blur-xl border border-gold-base/20 text-[9px] font-mono uppercase tracking-[0.15em] text-gold-light opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none shadow-md">
+          <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-void-deep/95 backdrop-blur-xl border border-gold-base/20 text-[9px] font-mono uppercase tracking-[0.15em] text-gold-light opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 whitespace-nowrap pointer-events-none shadow-lg shadow-black/80">
             {isPlaying ? "Silenciar" : "Santuario de Sonido"}
           </span>
         </motion.button>

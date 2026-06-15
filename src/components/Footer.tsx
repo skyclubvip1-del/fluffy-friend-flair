@@ -1,7 +1,8 @@
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowUpRight, Phone, Instagram, Clock, MessageCircle } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { ArrowUpRight, Phone, Instagram, Clock, MessageCircle, ArrowUp } from "lucide-react";
 import { buildWhatsAppUrl, generalReserveMessage } from "@/lib/whatsapp";
+
 
 const footerLinks = [
   { name: "La Barbería", href: "#barberia" },
@@ -34,7 +35,6 @@ const constellationLines: [number, number][] = [
   [3, 4],
   [4, 1],
 ];
-
 const Footer = () => {
   const footerRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
@@ -43,16 +43,36 @@ const Footer = () => {
   });
   const bgTextY = useTransform(scrollYProgress, [0, 1], ["10%", "-10%"]);
 
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 300);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const handleScrollClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith("#") && href !== "#") {
       e.preventDefault();
       const id = href.replace("#", "");
-      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+      const targetElement = document.getElementById(id);
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: "smooth" });
+      }
     }
   };
 
   return (
-    <footer id="footer" ref={footerRef} className="relative bg-void border-t border-white/10 overflow-hidden">
+    <footer id="footer" ref={footerRef} className="relative bg-void overflow-hidden">
+      {/* Top Border - Thin gold gradient */}
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-gold-base/45 to-transparent z-10" />
+
       {/* Giant Background SKY CLUB text with parallax */}
       <motion.div
         style={{ y: bgTextY }}
@@ -60,6 +80,7 @@ const Footer = () => {
       >
         SKY CLUB
       </motion.div>
+
 
       {/* Constellation Effect */}
       <svg
@@ -168,18 +189,18 @@ const Footer = () => {
                   href={buildWhatsAppUrl(generalReserveMessage())}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-white/60 hover:text-gold-base transition-colors duration-300"
+                  className="group flex items-center gap-2 text-white/60 hover:text-gold-base transition-colors duration-300"
                 >
-                  <MessageCircle className="w-3.5 h-3.5 text-gold-base" />
+                  <MessageCircle className="w-3.5 h-3.5 text-gold-base transition-all duration-300 group-hover:scale-120 group-hover:filter group-hover:drop-shadow-[0_0_6px_rgba(212,163,89,0.85)]" />
                   WhatsApp · Reservar
                 </a>
               </li>
               <li>
                 <a
                   href="tel:+34677263672"
-                  className="flex items-center gap-2 text-white/60 hover:text-gold-base transition-colors duration-300"
+                  className="group flex items-center gap-2 text-white/60 hover:text-gold-base transition-colors duration-300"
                 >
-                  <Phone className="w-3.5 h-3.5 text-gold-base" />
+                  <Phone className="w-3.5 h-3.5 text-gold-base transition-all duration-300 group-hover:scale-120 group-hover:filter group-hover:drop-shadow-[0_0_6px_rgba(212,163,89,0.85)]" />
                   +34 677 26 36 72
                 </a>
               </li>
@@ -188,14 +209,15 @@ const Footer = () => {
                   href="https://instagram.com/skyclub"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-white/60 hover:text-gold-base transition-colors duration-300"
+                  className="group flex items-center gap-2 text-white/60 hover:text-gold-base transition-colors duration-300"
                 >
-                  <Instagram className="w-3.5 h-3.5 text-gold-base" />
+                  <Instagram className="w-3.5 h-3.5 text-gold-base transition-all duration-300 group-hover:scale-120 group-hover:filter group-hover:drop-shadow-[0_0_6px_rgba(212,163,89,0.85)]" />
                   @skyclub
                 </a>
               </li>
               <li className="flex items-start gap-2 text-white/40 pt-2">
                 <Clock className="w-3.5 h-3.5 text-gold-base mt-0.5 shrink-0" />
+
                 <span className="font-mono text-xs leading-relaxed">
                   Lun – Sáb<br />10:00 – 20:00
                 </span>
@@ -297,8 +319,38 @@ const Footer = () => {
           </p>
         </div>
       </div>
+
+      {/* Floating Back to Top Button */}
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ 
+              opacity: 1, 
+              scale: 1, 
+              y: [0, -4, 0],
+              transition: {
+                y: {
+                  repeat: Infinity,
+                  duration: 2,
+                  ease: "easeInOut"
+                },
+                default: { duration: 0.3 }
+              }
+            }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            onClick={scrollToTop}
+            whileHover={{ scale: 1.1, backgroundColor: "rgba(212, 163, 89, 0.15)" }}
+            whileTap={{ scale: 0.9 }}
+            className="fixed bottom-8 right-8 z-40 w-12 h-12 rounded-full border border-gold-base/50 bg-[#0a0a0a]/90 text-gold-base backdrop-blur-md flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.5),0_0_15px_rgba(212,163,89,0.3)] hover:border-gold-base cursor-pointer transition-colors duration-300"
+          >
+            <ArrowUp className="w-5 h-5" />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </footer>
   );
 };
 
 export default Footer;
+
