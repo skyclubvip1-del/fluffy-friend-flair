@@ -1,54 +1,136 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Scissors, BookOpen, Mic, ArrowRight, X, ArrowLeft, Sparkles, ShoppingBag } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { buildWhatsAppUrl, reserveServiceMessage, generalReserveMessage } from "@/lib/whatsapp";
 
-// Iframe overlay for embedded service pages
+// upgraded 3D holographic detailed service overlay
 const ServiceOverlay = ({ url, title, onClose }: { url: string; title: string; onClose: () => void }) => {
+    const modalRef = useRef<HTMLDivElement>(null);
+    
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+
+    const springConfig = { damping: 25, stiffness: 140 };
+    const rotateX = useSpring(useTransform(mouseY, [-300, 300], [5, -5]), springConfig);
+    const rotateY = useSpring(useTransform(mouseX, [-300, 300], [-5, 5]), springConfig);
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+        if (!modalRef.current) return;
+        const rect = modalRef.current.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        mouseX.set(e.clientX - centerX);
+        mouseY.set(e.clientY - centerY);
+    };
+
+    const handleMouseLeave = () => {
+        mouseX.set(0);
+        mouseY.set(0);
+    };
+
+    useEffect(() => {
+        // Play rising portal entry FM chimes
+        window.dispatchEvent(
+            new CustomEvent("play-audio-chime", { 
+                detail: { freq: 392, isDeep: true } 
+            })
+        );
+        setTimeout(() => {
+            window.dispatchEvent(
+                new CustomEvent("play-audio-chime", { 
+                    detail: { freq: 587, isDeep: false } 
+                })
+            );
+        }, 100);
+        setTimeout(() => {
+            window.dispatchEvent(
+                new CustomEvent("play-audio-chime", { 
+                    detail: { freq: 784, isDeep: false } 
+                })
+            );
+        }, 200);
+    }, []);
+
+    const handleClose = () => {
+        window.dispatchEvent(
+            new CustomEvent("play-audio-chime", { 
+                detail: { freq: 587, isDeep: false } 
+            })
+        );
+        setTimeout(() => {
+            window.dispatchEvent(
+                new CustomEvent("play-audio-chime", { 
+                    detail: { freq: 294, isDeep: true } 
+                })
+            );
+        }, 120);
+        onClose();
+    };
+
     return (
         <AnimatePresence>
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 bg-void/97 backdrop-blur-md"
-            >
-                {/* Header bar */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gold-base/20 bg-void-deep/80 backdrop-blur-xl">
-                    <button
-                        onClick={onClose}
-                        className="flex items-center gap-2 text-gold-light hover:text-gold-base transition-colors duration-300 font-display text-sm uppercase tracking-wider cursor-pointer"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Volver a Sky Club
-                    </button>
-                    <span className="font-display font-semibold text-white/80 text-sm uppercase tracking-wider">
-                        {title}
-                    </span>
-                    <button
-                        onClick={onClose}
-                        className="w-10 h-10 rounded-full border border-gold-base/20 flex items-center justify-center hover:bg-white/5 transition-colors duration-300 cursor-pointer"
-                    >
-                        <X className="w-5 h-5 text-gold-base" />
-                    </button>
-                </div>
-
-                {/* Iframe */}
-                <motion.div
-                    initial={{ opacity: 0, y: 25 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                    className="w-full" style={{ height: "calc(100vh - 65px)" }}
+            <div className="fixed inset-0 z-50 bg-void/80 backdrop-blur-md flex items-center justify-center p-4 md:p-8 overflow-hidden">
+                {/* 3D Perspective Wrapper */}
+                <div 
+                    className="w-full h-full max-w-6xl perspective-1200 flex items-center justify-center cursor-none"
+                    onMouseMove={handleMouseMove}
+                    onMouseLeave={handleMouseLeave}
                 >
-                    <iframe
-                        src={url}
-                        title={title}
-                        className="w-full h-full border-0"
-                        allow="autoplay; fullscreen"
-                    />
-                </motion.div>
-            </motion.div>
+                    <motion.div
+                        ref={modalRef}
+                        initial={{ opacity: 0, scale: 0.9, rotateX: 12 }}
+                        animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, rotateX: -12 }}
+                        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                        style={{
+                            rotateX,
+                            rotateY,
+                            transformStyle: "preserve-3d",
+                        }}
+                        className="relative w-full h-full glass-panel-deep rounded-3xl border border-gold-base/35 shadow-gold-ultra overflow-hidden flex flex-col preserve-3d border-beam cursor-none"
+                    >
+                        {/* Header bar */}
+                        <div 
+                            className="flex items-center justify-between px-6 py-4 border-b border-gold-base/20 bg-void-deep/80 backdrop-blur-xl preserve-3d"
+                            style={{ transform: "translateZ(15px)" }}
+                        >
+                            <button
+                                onClick={handleClose}
+                                className="flex items-center gap-2 text-gold-light hover:text-gold-base transition-colors duration-300 font-display text-sm uppercase tracking-wider cursor-pointer"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                                Volver a Sky Club
+                            </button>
+                            <span className="font-display font-semibold text-white/80 text-sm uppercase tracking-wider">
+                                {title}
+                            </span>
+                            <button
+                                onClick={handleClose}
+                                className="w-10 h-10 rounded-full border border-gold-base/20 flex items-center justify-center hover:bg-white/5 transition-colors duration-300 cursor-pointer"
+                            >
+                                <X className="w-5 h-5 text-gold-base" />
+                            </button>
+                        </div>
+
+                        {/* Iframe portal wrapper */}
+                        <div 
+                            className="flex-1 w-full bg-void-deep/50 relative preserve-3d"
+                            style={{ transform: "translateZ(5px)" }}
+                        >
+                            {/* Scanning beam line overlay */}
+                            <div className="gold-scanner-line opacity-20" />
+                            
+                            <iframe
+                                src={url}
+                                title={title}
+                                className="w-full h-full border-0 rounded-b-3xl"
+                                allow="autoplay; fullscreen"
+                            />
+                        </div>
+                    </motion.div>
+                </div>
+            </div>
         </AnimatePresence>
     );
 };
